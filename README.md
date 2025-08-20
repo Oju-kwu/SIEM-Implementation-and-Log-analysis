@@ -1,10 +1,6 @@
 # SIEM-Implementation-and-Log-analysis
-## Executive Summary
-Our organization recently experience few suspicious incidence and our team was tasked with analyzing an OpenSSH Log file to help identify potential security threat to the organization, main objectives include the identification and monitoring of suspicious activities such as unusual IP addresses, multiple failed login attempts, and other indicators of potentialsecurity issues. 
-
-Splunk Cloud was deployed and Log file uploaded with a suspicious pattern identified, through the analyses we found several Authentication failures, Invalid user access attempts, repeated login failures (e.g., from 183.62.140.253), Disconnect messages (e.g., Bye Bye [preauth]) with multiple IP addresses with high event counts from different geolocations. The behavior of this log file confirms a brute-force attempts via automated scanning botnet or unauthorized probes. 
-
-A dashboard and an ALERT system was created with certain conditions to visualize, detects and trigger any potential brute-force or unauthorized access attempts. In addition, user roles were created and reviewed in line with the principle of least privilege.
+## Project Summary
+This project analyzes OpenSSH logs in Splunk Cloud to detect suspicious activities such as unusual IP addresses, repeated login failures, and brute-force attempts, with a real-time dashboard and alert system for proactive threat monitoring.
 
 # Objective
 - Create user account for the team
