@@ -16,7 +16,7 @@ A dashboard and an ALERT system was created with certain conditions to visualize
 - As well as extracting a field.
 
 ### Methodology
-## USER CREATION AND ROLE MANAGEMENT
+## User Creation and Role Management
 Users account were created within the Splunk Cloud environment showing the roles and access
 capabilities of members, 2 users have Admin privilege, 7 users with power role and 1 with user’s
 role.
@@ -32,6 +32,15 @@ security.
 
 <img width="1901" height="825" alt="Screenshot 2025-08-20 145656" src="https://github.com/user-attachments/assets/58e3bb0d-c424-4bb9-bb17-fadc9a65b058" />
 
+## Analysis of OpenSSH Log File
+The OpenSSH file was manually uploaded to Splunk Cloud which is crucial for managing and
+searching data effectively with the following parameters
+Source= OpenSSH.csv (the origin or where splunk gets it data from either a file or directory)
+Sourcetype = csv (the format, structure or how splunk data is parse or understood in this case,
+comma separated value was used)
+Index = main (where Splunk stores the data like a database or folder)
+
+<img width="1868" height="800" alt="Screenshot 2025-08-20 150849" src="https://github.com/user-attachments/assets/ba1f85ef-0746-441c-bc19-4f87c347ad8c" />
 
 
 # Recommended Improvements:
