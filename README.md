@@ -60,9 +60,18 @@ index="main" source="OpenSSH SIEM.csv" "authentication failure"
 
 <img width="1899" height="791" alt="Screenshot 2025-08-20 152559" src="https://github.com/user-attachments/assets/5478f81c-c943-4d8f-8dbc-9afc10234284" />
 
-This query allowed us to aggregate and rank the number of connection attempts by remote hosts (rhost). Based on the results, we identified approximately 15 unusual IP addresses exhibiting abnormal behavior or access patterns, indicating potential unauthorized access attempts or brute-force activities. These findings were further analyzed to support alert configurations and dashboard visualizations for proactive monitoring.
+## Unusual IP Address Detection
+To identify suspicious or unusual IP addresses attempting to access our
+infrastructure, we used the following Splunk SPL query:
+index="main" source="OpenSSH.csv" "authentication failure"
+| rex "rhost=(?<rhost>\d{1,3}(?:\.\d{1,3}){3})"
+| stats count by rhost
+| where count <= 5
+| sort -count
 
 <img width="1887" height="790" alt="Screenshot 2025-08-20 152949" src="https://github.com/user-attachments/assets/e310ad29-e1d7-44f1-9331-b2c60e33c4d5" />
+
+This query allowed us to aggregate and rank the number of connection attempts by remote hosts (rhost). Based on the results, we identified approximately 15 unusual IP addresses exhibiting abnormal behavior or access patterns, indicating potential unauthorized access attempts or brute-force activities. These findings were further analyzed to support alert configurations and dashboard visualizations for proactive monitoring.
 
 ## Analysis by Timestamp
 Further analysis done breaks the event by timestamps into 5-minute and group the events that occurred within the same 5-minute window, counts how many events like failed login attempts each remote host (rhost) generated per 5-minute window and filters only those IPs that attempted access more than 5 times in any 5-minute window then sorts the output in descending order by time (latest attempts first).
@@ -73,7 +82,13 @@ Further analysis done breaks the event by timestamps into 5-minute and group the
 
 Clearer insights into the activities of the above image shows IP 183.62.140.253 is highly aggressive showing 129-141 login attempts within just 5-minute intervals. IPs like 103.99.0.122, 187.141.143.180, and 112.195.230.3 are also showing repeated attempts which is possibly a brute-force or scanning activity.
 These are not normal user behaviors and suggest potential malicious actors attempting SSH login brute-force attacks.
-  
+
+## Analysis by Geolocation
+A total of 496 failed SSH authentication attempts were identified from non-Nigerian IP addresses with source IPs mapped to countries known for botnet or brute-force activity. These attempts represent a potential external brute-force attack pattern targeting our infrastructure. China is the top source country with over 300 combined attempts from multiple cities (Beijing, Shenzhen, Weifang, Langfang). Mexico and Vietnam also show a substantial volume of attempts. The data was filtered to exclude
+internal/Nigerian IPs suggesting these are likely unauthorized foreign entities.  
+
+
+
 # Recommended Improvements:
 ● Block the sender domain (access-accsecurity[.]com) at the email gateway: This domain is not affiliated with Microsoft and was used to spoof the brand. Blocking this domain at the perimeter (Exchange Online Protection, Proofpoint, Mimecast, etc.) will prevent further emails from this sender from reaching user inboxes.
 
