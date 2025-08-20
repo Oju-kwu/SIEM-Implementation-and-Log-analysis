@@ -2,7 +2,7 @@
 ## Project Summary
 This project analyzes OpenSSH logs in Splunk Cloud to detect suspicious activities such as unusual IP addresses, repeated login failures, and brute-force attempts, with a real-time dashboard and alert system for proactive threat monitoring.
 
-# Objective
+## Objective
 - Create user account for the team
 - Analyze the provided OpenSSH logsforsuspicious behavior
 - Detect any unusual IP addresses
@@ -11,7 +11,7 @@ This project analyzes OpenSSH logs in Splunk Cloud to detect suspicious activiti
 - Set up automated alertsfor critical events.
 - As well as extracting a field.
 
-### Methodology
+## Methodology
 ## User Creation and Role Management
 Users account were created within the Splunk Cloud environment showing the roles and access
 capabilities of members, 2 users have Admin privilege, 7 users with power role and 1 with user’s
