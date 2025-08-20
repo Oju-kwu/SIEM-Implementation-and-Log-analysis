@@ -87,27 +87,54 @@ These are not normal user behaviors and suggest potential malicious actors attem
 A total of 496 failed SSH authentication attempts were identified from non-Nigerian IP addresses with source IPs mapped to countries known for botnet or brute-force activity. These attempts represent a potential external brute-force attack pattern targeting our infrastructure. China is the top source country with over 300 combined attempts from multiple cities (Beijing, Shenzhen, Weifang, Langfang). Mexico and Vietnam also show a substantial volume of attempts. The data was filtered to exclude
 internal/Nigerian IPs suggesting these are likely unauthorized foreign entities.  
 
+<img width="1891" height="801" alt="Screenshot 2025-08-20 160640" src="https://github.com/user-attachments/assets/9ebfd664-7573-45b0-805d-483f30694827" />
 
+<img width="1884" height="782" alt="Screenshot 2025-08-20 160821" src="https://github.com/user-attachments/assets/9a35c70b-aad4-4811-b862-4bae826fd0b4" />
 
-# Recommended Improvements:
-● Block the sender domain (access-accsecurity[.]com) at the email gateway: This domain is not affiliated with Microsoft and was used to spoof the brand. Blocking this domain at the perimeter (Exchange Online Protection, Proofpoint, Mimecast, etc.) will prevent further emails from this sender from reaching user inboxes.
+## Analysisi by Users
+Analyses was done for failed SSH login attempts in the OpenSSH logs to identify the most frequently targeted usernames. The report states root was the primary target accounting for 74.3%nof all failed attempts. Other usernames like uucp, ftp, mysql, and git are common service accounts. The heavy targeting of root suggests an active brute-force attack aiming for administrative access. Attempts on service accounts indicate automated scans or credential stuffing using known
+usernames. These patterns are typical of external threat actors probing for vulnerable systems.
 
-● Blacklist the originating IP address (89[.]144[.]44[.]41): This IP address belongs to a hosting provider (HostSailor) with a known history of abuse-related activity. Blacklisting this IP prevents future attempts from the same infrastructure and may help reduce similar attack vectors.
-.
-● Monitor for related campaigns or IOC matches (domains, IPs, headers): Use threat intel feeds or your SIEM to watch for similar Reply-To patterns, sender domains, or tracking pixel URLs (thebandalisty.com). Monitor for any other messages from the same ASN or IP block used in this campaign.
+<img width="1881" height="762" alt="Screenshot 2025-08-20 161539" src="https://github.com/user-attachments/assets/7f3c3086-584c-41e3-9532-c061734e1eda" />
 
-● Quarantine or auto-delete unauthenticated Microsoft-branded messages: Set conditional mail flow rules (Transport Rules / Mail Flow Rules) that quarantine or flag any message claiming to be from Microsoft.com or Outlook.com domains if they fail SPF, DKIM, or DMARC. This adds a defensive layer without outright blocking potentially legitimate external senders.
+## Dashboard Configuration
+A Dashboard was created to monitor and give early warning sign to a high frequency logs of disconnects initiated from the malicious IP addresses. The repetitive pattern and timing suggest that a system likely external is attempting to establish SSH connections and being disconnectedrepeatedly before authentication ([preauth]). The disconnection messages are consistent, indicating potential scanning or brute-force attack behavior.
 
-● Add detection rules for tracking pixels and beaconing links: Use a secure email gateway or a DLP/content filter to identify invisible <img> tags linked to remote third-party URLs. These are often used for tracking engagement or setting up further social engineering.
+<img width="1823" height="702" alt="Screenshot 2025-08-20 163812" src="https://github.com/user-attachments/assets/64978452-d025-489b-90f9-27256a9636fc" />
 
-● Consider integrating a sandbox/detonation environment: If not already deployed, use a sandbox to detonate suspicious attachments or follow suspicious links. While this email was HTML-based and had no attachments, future variants may include weaponized files or redirect chains.
+## Alert Configuration
+To complement the dashboard, an automated alert system was configured with the following settings:
+- Schedule: Runs daily at 8:00 AM (WAT).
+- Alert Expiration: Set to expire after 24 hours.
+-  Trigger Condition: Fires when the number of matching results is greater than 2.
+-  Notification Type: Sent via plain text email.
+-  Recipients: All Group 4 members were added as recipients to ensure
+collective visibility.
+-  Domain Restriction: Splunk was configured to only allow emails to be sent
+to a specific domain (e.g., gmail.com) to enhance security and limit alert
+delivery to approved users.
 
-● Notify internal users and conduct phishing awareness reinforcement: Since the email mimics Microsoft account alerts, users may be susceptible to social engineering tactics. Circulating a short internal advisory with red flags from this case (e.g., Gmail reply address, unverified sender, Russia login bait) helps strengthen user awareness and reduce click risk.
+This alert is designed to monitor and automatically detect suspicious SSH disconnect events which could indicate Brute-force attack attempts (automated login failures), Network scanning or reconnaissance activity Abuse from malicious IP addresses (bots or unauthorized users), Unexpected session terminations on critical servers.
 
+<img width="1916" height="462" alt="Screenshot 2025-08-20 172748" src="https://github.com/user-attachments/assets/54c095ea-5b3c-48d7-9c12-4e54e6b5d4d4" />
 
-# Conclusion
-This email is a clear phishing attempt designed to impersonate Microsoft's account security alerts. Key indicators include the non-Microsoft sender domain (access-accsecurity.com), a Gmail Reply-To address, failed or missing email authentication (SPF, DKIM, DMARC), an anonymous authentication status within Exchange, a suspicious originating IP address from Germany, and a hidden tracking pixel from an unrelated domain. These findings confirm the email's malicious intent to socially engineer recipients and compromise their credentials. Immediate actions, such as blocking the sender domain and IP and enhancing email authentication checks, are recommended to mitigate risks and prevent future phishing attacks.
+<img width="1887" height="548" alt="Screenshot 2025-08-20 182959" src="https://github.com/user-attachments/assets/e5c7eeef-b350-4e1f-8978-6e04229296fb" />
 
+## Field Extraction Configuration
+A custom field (src_ip) was created and extracted to store the IP 183.62.140.253. The src_ip fielis crucial for tracking source hosts in SSH disconnect events and ensure the IP is constantly tagged for correlation, reporting and alerting, it provides actionable intelligence about suspicious SSH activity and inform automated defenses, blacklists, and SIEM correlation rules. Splunk identified 867 events generated by this IP, covering 99.95% of all events in the dataset.
 
- 
+<img width="1883" height="798" alt="Screenshot 2025-08-20 184044" src="https://github.com/user-attachments/assets/20031fbf-340d-41fa-8c06-fd759570ccac" />
 
+<img width="1914" height="833" alt="Screenshot 2025-08-20 184913" src="https://github.com/user-attachments/assets/a8f28426-ae77-4ebc-86e1-5e3fd6dd58b4" />
+
+## Conclusion
+The analysis of the OpenSSH.csv logs through Splunk has revealed a high number of failed SSH authentication attempts primarily from a concentrated group of external IP addresses like 183.62.140.253 from Beijing China as the top offender with 285 login failures, several other IPs from the same subnet were also active suggesting automated or coordinated attack attempts likely brute-force in nature. Attempts were mainly directed at privileged accounts like root accounting for 74% of the total failed logins 369 out of 496, The source of attacks includes countries such as China, Mexico, Vietnam, Russia, and the United States, indicating global threat
+vectors targeting the system. These patterns are typical of credential stuffing, dictionary attacks, or brute force login attempts, and if not mitigated could lead to unauthorized system access and compromise of critical infrastructure.
+
+## Recommendation
+To enhance the security of your SSH service and prevent unauthorized access, this should be implemented:
+1. Immediate Mitigation: Block/Blacklist Malicious IPs using firewall rules to block high-risk IPs like 183.62.140.253 Disable Root Login In
+2. Access Hardening: Enable Rate Limiting: Deploy fail2ban or sshguard to automatically block IPs with multiple failed attempts.
+Restrict Access via Geo-IP: Implement IP filtering to block SSH access from high-rise countries unless necessary for operations. Use SSH Keys Instead of Passwords: Enforce public key authentication for all users to eliminate password-based attacks.
+3. Account Security: Enforce Strong Password Policies: Require complex passwords and change them
+periodically Limit SSH Access to Specific Users: Use AllowUsers or AllowGroups in SSH configuration.
