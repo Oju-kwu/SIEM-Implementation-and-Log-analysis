@@ -18,8 +18,8 @@ capabilities of members, 2 users have Admin privilege, 7 users with power role a
 role.
 The aim is to ensure proper access control, validate role assignments, and support internal audits
 or compliance efforts.
-## During accountsetup:
-The Time Zone for each user was configured to West Africa Time (WAT) to maintain consistency
+## During account setup:
+The Time Zone for each user was configured to West Africa Time (WAT) to maintain consistency in
 in event timestamps.
 The default application was set to Launcher (Home) for a uniform user interface experience upon
 login.
